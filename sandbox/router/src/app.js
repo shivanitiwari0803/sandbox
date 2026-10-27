@@ -15,19 +15,33 @@ app.get("/api/status/ready", (req, res) => {
   });
 });
 
-const proxies = {}
+const proxies = {};
+const agentProxies = {};
 
-function getProxy(sandboxId){
- const target = `http://sandbox-service-${sandboxId}`;
+function getProxy(sandboxId) {
+  const target = `http://sandbox-service-${sandboxId}`;
 
-  if(!proxies[sandboxId]){
+  if (!proxies[sandboxId]) {
     proxies[sandboxId] = createProxyMiddleware({
       target,
-      changeOrigin:true,
-      ws:true
-    })
+      changeOrigin: true,
+      ws: true,
+    });
   }
-  return proxies[sandboxId]
+  return proxies[sandboxId];
+}
+
+function getAgentProxy(sandboxId) {
+  const target = `http://sandbox-service-${sandboxId}`;
+
+  if (!agentProxies[sandboxId]) {
+    agentProxies[sandboxId] = createProxyMiddleware({
+      target,
+      changeOrigin: true,
+      ws: true,
+    });
+  }
+  return agentProxies[sandboxId];
 }
 
 app.use((req, res, next) => {
@@ -35,7 +49,11 @@ app.use((req, res, next) => {
 
   const sandboxId = host.split(".")[0];
 
-  return getProxy(sandboxId)(req, res, next);
+  if (host.split(".")[1] === "agent") {
+    return getAgentProxy(sandboxId)(req, res, next);
+  } else if (host.split(".")[1] === "preview") {
+    return getProxy(sandboxId)(req, res, next);
+  }
 });
 
 export default app;
