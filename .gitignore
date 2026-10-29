@@ -1,4 +1,16 @@
-node_modules
+
+# Docker image archives
+*.tar
+
+# Local environment
 .env
-.tar
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
 .git-old/
