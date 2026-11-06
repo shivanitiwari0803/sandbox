@@ -3,7 +3,7 @@ import { tool } from "langchain";
 import * as z from "zod";
 
 export const listFiles = tool(
-  async ({ paths: [] }) => {
+  async () => {
     console.log("===================");
     console.log("listfiles tool is used");
     console.log("===================");
@@ -19,7 +19,7 @@ export const listFiles = tool(
     return JSON.stringify(response.data.files);
   },
   {
-    name: "list-files",
+    name: "list_files",
     description:
       "List all the files in the project directory. This is useful for understanding what  are available to work with.",
     schema: z.object({}),
@@ -27,7 +27,7 @@ export const listFiles = tool(
 );
 
 export const readFiles = tool(
-  async ({ files: [] }) => {
+  async ({ files }) => {
     console.log("===================");
     console.log("readfiles tool is used", files);
     console.log("===================");
@@ -58,7 +58,7 @@ export const readFiles = tool(
 );
 
 export const updateFiles = tool(
-  async ({ files: [] }) => {
+  async ({ files }) => {
     console.log("===================");
     console.log("readfiles tool is used", files);
     console.log("===================");
@@ -73,7 +73,7 @@ export const updateFiles = tool(
     console.log("response from updatefile is ", response.data);
     console.log("===================");
 
-    return JSON.stringify((await response).data.results);
+    return JSON.stringify(response.data.results);
   },
   {
     name: "update_files",
