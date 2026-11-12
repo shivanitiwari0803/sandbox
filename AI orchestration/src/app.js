@@ -7,10 +7,18 @@ const app = express()
 app.use(morgan('dev'))
 app.use(express.json())
 
-app.get('/api/ai/health',(req,res)=>{
+
+app.get('/api/status/health',(req,res)=>{
     res.status(200).json({
         status: 'ok'
     })
 })
+
+app.get('/api/status/ready',(req,res)=>{
+    res.status(200).json({
+        status: 'ready'
+    })
+})
+
 
 export default app

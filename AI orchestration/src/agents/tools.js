@@ -41,7 +41,7 @@ export const readFiles = tool(
     console.log("response from readfile is ", response.data);
     console.log("===================");
 
-    return JSON.stringify(response.data);
+    return JSON.stringify(response.data.files);
   },
   {
     name: "read_files",
@@ -60,7 +60,7 @@ export const readFiles = tool(
 export const updateFiles = tool(
   async ({ files }) => {
     console.log("===================");
-    console.log("readfiles tool is used", files);
+    console.log("updatefiles tool is used", files);
     console.log("===================");
 
     const response = await axios.patch(
@@ -83,11 +83,9 @@ export const updateFiles = tool(
       files: z.array(
         z
           .object({
-            path: z
-              .string()
-              .describe("The absolute path of the file to update"),
-            content: z.string().describe("The new content for the file"),
-          })
+            file: z.string().describe("The file path to update"),
+      content: z.string().describe("The new file content")
+    })
       ).describe("The list of files to update and their new contents")
     }),
   },
