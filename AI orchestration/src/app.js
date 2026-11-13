@@ -20,5 +20,8 @@ app.get('/api/status/ready',(req,res)=>{
     })
 })
 
+app.use("/api/ai", agentRouter
+    
+)
 
 export default app
