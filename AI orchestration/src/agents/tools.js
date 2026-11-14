@@ -9,7 +9,7 @@ export const listFiles = tool(
     console.log("===================");
 
     const response = await axios.get(
-      "http://01a1930b-a06b-73e0-97af-5ec84bd12a3e.agent.localhost/list-files",
+      "http://sandbox-service-01a1d082-0583-700b-9d26-de3d4b982c20:3000/list-files",
     );
 
     console.log("===================");
@@ -33,7 +33,7 @@ export const readFiles = tool(
     console.log("===================");
 
     const response = await axios.get(
-      "http://01a1930b-a06b-73e0-97af-5ec84bd12a3e.agent.localhost/read-files?files=" +
+      "http://sandbox-service-01a1d082-0583-700b-9d26-de3d4b982c20:3000/read-files?files=" +
         files.join(","),
     );
 
@@ -64,7 +64,7 @@ export const updateFiles = tool(
     console.log("===================");
 
     const response = await axios.patch(
-      "http://01a1930b-a06b-73e0-97af-5ec84bd12a3e.agent.localhost/update-files",
+      "http://sandbox-service-01a1d082-0583-700b-9d26-de3d4b982c20:3000/update-files",
       {
         updates: files,
       },
@@ -78,15 +78,42 @@ export const updateFiles = tool(
   {
     name: "update_files",
     description:
-      "update the contents of specified files. This is useful for making chnages to file based on the requirements of the task at hand. This tool can also use to create new files by providing a new file name in the file field and the content to be added in the content field.",
+      "update the contents of specified files. This is useful for making changes to file based on the requirements of the task at hand.",
+    schema: z.object({
+      files: z
+        .array(
+          z.object({
+            file: z.string().describe("The file path to update"),
+            content: z.string().describe("The new file content"),
+          }),
+        )
+        .describe("The list of files to update and their new contents"),
+    }),
+  },
+);
+
+export const createFiles = tool(
+  async ({ files }) => {
+    const response = await axios.post(
+      "http://sandbox-service-01a1d082-0583-700b-9d26-de3d4b982c20:3000/create-files",
+      {
+        files,
+      },
+    );
+
+    return JSON.stringify(response.data.results);
+  },
+  {
+    name: "create_files",
+    description:
+      "Create new files in the project. Use this when a required file does not already exist. Do not use this to overwrite existing files.",
     schema: z.object({
       files: z.array(
-        z
-          .object({
-            file: z.string().describe("The file path to update"),
-      content: z.string().describe("The new file content")
-    })
-      ).describe("The list of files to update and their new contents")
+        z.object({
+          file: z.string(),
+          content: z.string(),
+        }),
+      ),
     }),
   },
 );
