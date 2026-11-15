@@ -3,13 +3,13 @@ import { tool } from "langchain";
 import * as z from "zod";
 
 export const listFiles = tool(
-  async () => {
+  async ({}, config) => {
     console.log("===================");
     console.log("listfiles tool is used");
     console.log("===================");
 
     const response = await axios.get(
-      "http://sandbox-service-01a1d082-0583-700b-9d26-de3d4b982c20:3000/list-files",
+      `http://sandbox-service-${config.context.projectId}:3000/list-files`,
     );
 
     console.log("===================");
@@ -27,13 +27,13 @@ export const listFiles = tool(
 );
 
 export const readFiles = tool(
-  async ({ files }) => {
+  async ({ files },config) => {
     console.log("===================");
     console.log("readfiles tool is used", files);
     console.log("===================");
 
     const response = await axios.get(
-      "http://sandbox-service-01a1d082-0583-700b-9d26-de3d4b982c20:3000/read-files?files=" +
+      `http://sandbox-service-${config.context.projectId}:3000/read-files?files=` +
         files.join(","),
     );
 
@@ -58,13 +58,13 @@ export const readFiles = tool(
 );
 
 export const updateFiles = tool(
-  async ({ files }) => {
+  async ({ files },config) => {
     console.log("===================");
     console.log("updatefiles tool is used", files);
     console.log("===================");
 
     const response = await axios.patch(
-      "http://sandbox-service-01a1d082-0583-700b-9d26-de3d4b982c20:3000/update-files",
+      `http://sandbox-service-${config.context.projectId}:3000/update-files`,
       {
         updates: files,
       },
@@ -93,9 +93,9 @@ export const updateFiles = tool(
 );
 
 export const createFiles = tool(
-  async ({ files }) => {
+  async ({ files },config) => {
     const response = await axios.post(
-      "http://sandbox-service-01a1d082-0583-700b-9d26-de3d4b982c20:3000/create-files",
+      `http://sandbox-service-${config.context.projectId}:3000/create-files`,
       {
         files,
       },
