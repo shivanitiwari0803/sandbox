@@ -1,12 +1,19 @@
-import { Router } from "express";
 
+import { Router } from "express";
 import agent from "../agents/code.agent.js";
 
 const agentRouter = Router();
 
 agentRouter.post("/invoke", async (req, res) => {
+  const startedAt = Date.now();
+  const { message, projectId } = req.body;
+
+  console.log("[AI] Invoke request received");
+  console.log("[AI] Project ID:", projectId);
+  console.log("[AI] Message length:", message?.length);
+
   try {
-    const { message, projectId } = req.body;
+    console.log("[AI] Calling agent.invoke()");
 
     const response = await agent.invoke(
       {
@@ -23,10 +30,26 @@ agentRouter.post("/invoke", async (req, res) => {
         },
       },
     );
-    res.json({ response });
+
+    console.log(
+      `[AI] Agent completed in ${Date.now() - startedAt}ms`
+    );
+
+    if (!res.headersSent) {
+      res.json({ response });
+    }
   } catch (error) {
-    console.error("Error invoking agent:", error);
-    res.status(500).json({ error: "Failed to invoke agent" });
+    console.error(
+      `[AI] Agent failed after ${Date.now() - startedAt}ms:`,
+      error
+    );
+
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: "Failed to invoke agent",
+        details: error.message,
+      });
+    }
   }
 });
 

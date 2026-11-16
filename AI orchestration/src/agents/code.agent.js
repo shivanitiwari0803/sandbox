@@ -1,13 +1,12 @@
 import "dotenv/config";
 
-import { ChatGroq } from "@langchain/groq";
+import { ChatGoogle } from "@langchain/google";
 import { listFiles, readFiles, updateFiles, createFiles } from "./tools.js";
 
 import { createAgent } from "langchain";
 
-const model = new ChatGroq({
-  model: "openai/gpt-oss-120b",
-  apiKey: process.env.GROQ_API_KEY,
+const model = new ChatGoogle("gemini-3.8-flash", {
+  apiKey: process.env.GOOGLE_API_KEY,
   temperature: 0,
   maxTokens: 2048,
 });
