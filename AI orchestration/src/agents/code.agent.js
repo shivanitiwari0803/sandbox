@@ -1,15 +1,15 @@
 import "dotenv/config";
 
-import { ChatGoogle } from "@langchain/google";
+import { ChatGroq } from "@langchain/groq";
 import { listFiles, readFiles, updateFiles, createFiles } from "./tools.js";
 
 import { createAgent } from "langchain";
 
-const model = new ChatGoogle({
-  model: "gemini-3.8-flash",
-  apiKey: process.env.GOOGLE_API_KEY,
+const model = new ChatGroq({
+  model: "openai/gpt-oss-120b",
+  apiKey: process.env.GROQ_API_KEY,
   temperature: 0,
-  maxRetries: 1,
+  maxTokens: 2048,
 });
 
 const systemPrompt = `You are a senior frontend engineer operating inside a sandboxed project.
