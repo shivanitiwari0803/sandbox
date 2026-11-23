@@ -34,10 +34,10 @@ spec:
             timeoutSeconds: 10
           resources:
             env:
-              - name: GOOGLE_API_KEY
+              - name: MISTRAL_API_KEY
                 valueFrom:
                   secretKeyRef:
-                    key: GOOGLE_API_KEY
+                    key: MISTRAL_API_KEY
                     name: ai-secret
             limits:
               cpu: 500m

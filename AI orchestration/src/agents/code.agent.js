@@ -1,15 +1,16 @@
 import "dotenv/config";
 
-import { ChatGroq } from "@langchain/groq";
+import { ChatMistralAI } from "@langchain/mistralai";
 import { listFiles, readFiles, updateFiles, createFiles } from "./tools.js";
 
 import { createAgent } from "langchain";
 
-const model = new ChatGroq({
-  model: "openai/gpt-oss-120b",
-  apiKey: process.env.GROQ_API_KEY,
+const model = new ChatMistralAI({
+  apiKey: process.env.MISTRAL_API_KEY,
+  model: "mistral-small-2603",
   temperature: 0,
-  maxTokens: 2048,
+  maxTokens: 4096,
+  maxRetries: 2,
 });
 
 const systemPrompt = `You are a senior frontend engineer operating inside a sandboxed project.

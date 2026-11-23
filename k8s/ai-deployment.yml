@@ -26,11 +26,11 @@ spec:
               cpu: "500m"
               memory: "256Mi"
           env:
-            - name: GOOGLE_API_KEY
+            - name: MISTRAL_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: ai-secret
-                  key: GOOGLE_API_KEY
+                  key: MISTRAL_API_KEY
           livenessProbe:
             httpGet:
               path: /api/status/health
