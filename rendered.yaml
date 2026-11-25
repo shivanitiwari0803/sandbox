@@ -34,10 +34,10 @@ spec:
             timeoutSeconds: 10
           resources:
             env:
-              - name: MISTRAL_API_KEY
+              - name: GROQ_API_KEY
                 valueFrom:
                   secretKeyRef:
-                    key: MISTRAL_API_KEY
+                    key: GROQ_API_KEY
                     name: ai-secret
             limits:
               cpu: 500m

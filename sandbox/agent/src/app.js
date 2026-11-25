@@ -120,32 +120,63 @@ app.get("/read-files", async (req, res) => {
 app.patch("/update-files", async (req, res) => {
   const updates = req.body.updates;
 
-  if (!updates || !Array.isArray(updates)) {
+  if (!Array.isArray(updates) || updates.length === 0) {
     return res.status(400).json({
-      message:
-        'INvalid requesy body. Expected a JSON object with an "updates" property containing an array of file updates. ',
+      message: "No files provided",
       status: "error",
     });
   }
 
   const results = await Promise.all(
-    updates.map(async (update) => {
-      const { file, content } = update;
-      const filePath = path.join(WORKING_DIR, file);
+    updates.map(async ({ file, content }) => {
       try {
+        if (!file || typeof content !== "string") {
+          throw new Error("Invalid file path or content");
+        }
+
+        const filePath = path.resolve(WORKING_DIR, file);
+
+        // Prevent writing outside workspace
+        if (
+          filePath !== WORKING_DIR &&
+          !filePath.startsWith(WORKING_DIR + path.sep)
+        ) {
+          throw new Error("Invalid file path");
+        }
+
+        // Create parent directories if they don't exist
+        await fs.promises.mkdir(path.dirname(filePath), {
+          recursive: true,
+        });
+
+        // Check whether file already exists
+        const exists = await fs.promises
+          .access(filePath)
+          .then(() => true)
+          .catch(() => false);
+
+        // Update existing file or create new file
         await fs.promises.writeFile(filePath, content, "utf-8");
+
         return {
-          [filePath]: "file upload successfully",
+          file: path.relative(WORKING_DIR, filePath),
+          status: exists ? "updated" : "created",
         };
       } catch (err) {
         return {
-          [filePath]: `Error updating file :${err.message}`,
+          file,
+          status: "failed",
+          error: err.message,
         };
       }
-    }),
+    })
   );
-  res.status(200).json({
-    message: "file update results",
+
+  const failed = results.some(
+    (result) => result.status === "failed"
+  );
+
+  res.status(failed ? 207 : 200).json({
     results,
   });
 });
