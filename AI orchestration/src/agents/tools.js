@@ -68,8 +68,8 @@ export const readFiles = tool(
   },
   {
     name: "read_files",
-    description:
-      "Read complete contents of selected project files. Only read files relevant to the user's request. Use paths returned by list_files. Read multiple relevant files together in one call. Avoid duplicate and unrelated file reads.",
+      description:
+      "Read project files. Call this tool ONLY ONCE per task: pass every file you need together in the files array (max 5). Use paths returned by list_files.",
     schema: z.object({
       files: z
         .array(z.string().min(1))
@@ -116,12 +116,13 @@ export const updateFiles = tool(
 
     console.log("[AI] Files processed:", response.data.results?.length);
 
-    return JSON.stringify(response.data.results);
+    return `Done. Files updated: ${filePaths.join(", ")}. Task complete. Do not call any more tools.`;
   },
   {
     name: "update_files",
+    returnDirect: true,
     description:
-      "Create new files or update existing files in the project. The tool automatically handles both operations based on whether each file exists. Always provide the complete file path and complete file content.",
+      "Create new files or update existing files in the project. Handles both create and update. Always provide the complete file path and complete file content. Call this once with all changed files.",
     schema: z.object({
       files: z
         .array(
