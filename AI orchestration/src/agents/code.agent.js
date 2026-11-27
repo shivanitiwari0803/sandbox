@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 import { ChatGroq } from "@langchain/groq";
-import { listFiles, readFiles, updateFiles } from "./tools.js";
+import { updateFiles } from "./tools.js";
 
 import { createAgent } from "langchain";
 
@@ -11,43 +11,44 @@ const model = new ChatGroq({
   temperature: 0,
   maxTokens: 4096,
   maxRetries: 5,
+  modelKwargs: { reasoning_effort: "low" },
   callbacks: [
     {
       handleLLMEnd(output) {
-        const u = output.generations?.[0]?.[0]?.message?.usage_metadata;
-        console.log("[AI] LLM call tokens:", JSON.stringify(u));
+        const msg = output.generations?.[0]?.[0]?.message;
+        console.log(
+          "[AI] LLM call tokens:",
+          JSON.stringify(msg?.usage_metadata),
+          "finish_reason:",
+          msg?.response_metadata?.finish_reason
+        );
       },
     },
   ],
 });
 
+const systemPrompt = `You are a senior frontend engineer working inside a sandboxed React (Vite) project.
 
-const systemPrompt = `You are a senior frontend engineer working inside a sandboxed project.
-
-Implement the user's request completely using the available tools.
+The project file list and the current contents of src/App.jsx are given in the user message.
+Do the user's request by calling update_files EXACTLY ONCE with every file you change or create, each with its complete content.
 
 RULES:
-- Always call list_files first.
-- Identify all relevant files before reading.
-- Use only paths returned by list_files.
-- Use update_files for creating and updating files.
-- Provide complete file contents in every update.
-- Preserve the existing framework, dependencies and architecture.
-- Avoid unrelated changes and unnecessary tool calls.
+- update_files is your only tool. You cannot read other files.
+- To build a new page or site, replace src/App.jsx and src/App.css completely with new code. Do not keep old template styles. For a small edit to an existing page, change only what is needed.
+- NEVER use any image files from the project (hero.png, react.svg, vite.svg or anything in src/assets). They are leftover template files, not real product photos.
+- For product pictures use a large emoji (for example 👕 👖 🧥 👗 🧢 👟) centered inside a fixed-height box (height 200px) with a soft gradient background. For a hero section use a gradient background with text only, no image.
+- Put all content in a centered container with max-width 1100px and padding 0 20px. Use grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) for product grids so cards stay the same size.
+- Build a polished page: navbar, hero with a heading and a call-to-action button, a card grid, and a footer. Use a consistent color palette in CSS variables, generous spacing, rounded corners, soft shadows, hover effects, and one media query for mobile.
+- Use realistic sample content (names, prices, short descriptions), not lorem ipsum.
+- Keep the CSS compact. Preserve the existing framework and dependencies.
 - Never claim code was tested or executed.
-
-WORKFLOW:
-1. Call list_files once.
-2. Decide ALL files you need, then call read_files EXACTLY ONCE with every path in a single array (max 5). Never call read_files a second time.
-3. Call update_files EXACTLY ONCE with all changed files.
-4. Reply with a brief summary of changes.`;
-
+- After update_files succeeds, stop.`;
 
 const agent = createAgent({
   model,
-  tools: [listFiles, readFiles, updateFiles],
+  tools: [updateFiles],
   systemPrompt,
-  }).withConfig({
+}).withConfig({
   recursionLimit: 12,
 });
 
